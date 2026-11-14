@@ -13,7 +13,8 @@ import {
     Pool__InsufficientLiquidityBurned,
     Pool__InsufficientOutputAmount,
     Pool__InsufficientInputAmount,
-    Pool__InsufficientLiquidity
+    Pool__InsufficientLiquidity,
+    Pool__ZeroLiquidityMinted
 } from "../../src/Pool.sol";
 
 contract MockToken is ERC20 {
@@ -149,6 +150,23 @@ contract PoolTest is Test {
         vm.expectRevert(abi.encodeWithSelector(Pool__InsufficientLiquidityMinted.selector, 20 ether - 1000, 25 ether));
         pool.addLiquidity(10 ether, 40 ether, 25 ether);
     }
+
+    function test_addLiquidityRevertZeroLiquidityMinted() public {
+    vm.prank(alice);
+    pool.addLiquidity(10 ether, 40 ether, 0);
+
+    vm.expectRevert(Pool__ZeroLiquidityMinted.selector);
+    vm.prank(bob);
+    pool.addLiquidity(1, 1, 0);
+
+    (uint256 reserve0, uint256 reserve1) = pool.getReserves();
+    assertEq(reserve0, 10 ether);
+    assertEq(reserve1, 40 ether);
+
+    assertEq(token0.balanceOf(bob), INITIAL_BALANCE);
+    assertEq(token1.balanceOf(bob), INITIAL_BALANCE);
+    assertEq(pool.i_lpToken().balanceOf(bob), 0);
+}
 
     /*//////////////////////////////////////////////////////////////
                         REMOVE LIQUIDITY TESTS

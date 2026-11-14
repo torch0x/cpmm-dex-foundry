@@ -16,6 +16,7 @@ error Pool__InsufficientLiquidityBurned();
 error Pool__InsufficientOutputAmount(uint256 amountOut, uint256 minAmountOut);
 error Pool__InsufficientInputAmount();
 error Pool__InsufficientLiquidity();
+error Pool__ZeroLiquidityMinted();
 
 contract Pool is ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -77,6 +78,14 @@ contract Pool is ReentrancyGuard {
             liquidity = initialLiquidity - MINIMUM_LIQUIDITY;
         } else {
             liquidity = Math.min((amount0 * totalLp) / _reserve0, (amount1 * totalLp) / _reserve1);
+        }
+
+        if (liquidity == 0) {
+            revert Pool__ZeroLiquidityMinted();
+        }
+
+        if (liquidity < minLiquidity) {
+            revert Pool__InsufficientLiquidityMinted(liquidity, minLiquidity);
         }
 
         if (liquidity < minLiquidity) {
