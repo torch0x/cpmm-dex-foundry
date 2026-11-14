@@ -152,21 +152,21 @@ contract PoolTest is Test {
     }
 
     function test_addLiquidityRevertZeroLiquidityMinted() public {
-    vm.prank(alice);
-    pool.addLiquidity(10 ether, 40 ether, 0);
+        vm.prank(alice);
+        pool.addLiquidity(10 ether, 40 ether, 0);
 
-    vm.expectRevert(Pool__ZeroLiquidityMinted.selector);
-    vm.prank(bob);
-    pool.addLiquidity(1, 1, 0);
+        vm.expectRevert(Pool__ZeroLiquidityMinted.selector);
+        vm.prank(bob);
+        pool.addLiquidity(1, 1, 0);
 
-    (uint256 reserve0, uint256 reserve1) = pool.getReserves();
-    assertEq(reserve0, 10 ether);
-    assertEq(reserve1, 40 ether);
+        (uint256 reserve0, uint256 reserve1) = pool.getReserves();
+        assertEq(reserve0, 10 ether);
+        assertEq(reserve1, 40 ether);
 
-    assertEq(token0.balanceOf(bob), INITIAL_BALANCE);
-    assertEq(token1.balanceOf(bob), INITIAL_BALANCE);
-    assertEq(pool.i_lpToken().balanceOf(bob), 0);
-}
+        assertEq(token0.balanceOf(bob), INITIAL_BALANCE);
+        assertEq(token1.balanceOf(bob), INITIAL_BALANCE);
+        assertEq(pool.i_lpToken().balanceOf(bob), 0);
+    }
 
     /*//////////////////////////////////////////////////////////////
                         REMOVE LIQUIDITY TESTS
@@ -251,9 +251,7 @@ contract PoolTest is Test {
         uint256 lpAlice = pool.addLiquidity(100 ether, 100 ether, 0);
 
         vm.prank(alice);
-        vm.expectRevert(
-            abi.encodeWithSelector(Pool__InsufficientOutputAmount.selector, 50 ether - 500, 60 ether)
-        );
+        vm.expectRevert(abi.encodeWithSelector(Pool__InsufficientOutputAmount.selector, 50 ether - 500, 60 ether));
         // minAmount0 is satisfied (0), but minAmount1 is not (60 ether > ~50 ether)
         pool.removeLiquidity(lpAlice / 2, 0, 60 ether);
     }
@@ -291,9 +289,7 @@ contract PoolTest is Test {
     }
 
     function test_getAmountInRevertZeroOutput() public {
-        vm.expectRevert(
-            abi.encodeWithSelector(Pool__InsufficientOutputAmount.selector, 0, 1)
-        );
+        vm.expectRevert(abi.encodeWithSelector(Pool__InsufficientOutputAmount.selector, 0, 1));
         pool.getAmountIn(0, 100 ether, 100 ether);
     }
 
